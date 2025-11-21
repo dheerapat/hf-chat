@@ -1,0 +1,26 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo-chatui
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    #   - mongo_data:/data/db
+
+  chat-ui:
+    image: ghcr.io/huggingface/chat-ui-db:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URL=mongodb://mongo-chatui:27017
+      - OPENAI_BASE_URL=https://integrate.api.nvidia.com/v1
+      - OPENAI_API_KEY=nvapi-... # <- add api key here
+    volumes:
+      - db:/data
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+volumes:
+  db:
+  # mongo_data: # Uncomment if you enable the volume for mongo above
